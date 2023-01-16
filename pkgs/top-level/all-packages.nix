@@ -8,7 +8,7 @@
 { lib, noSysDirs, config, overlays }:
 res: pkgs: super:
 
-with pkgs;
+with pkgs.__splicedPackages;
 
 {
   # A module system style type tag
@@ -14205,6 +14205,7 @@ with pkgs;
   # The GCC used to build libc for the target platform. Normal gccs will be
   # built with, and use, that cross-compiled libc.
   gccCrossStageStatic = assert stdenv.targetPlatform != stdenv.hostPlatform; let
+    binutilsNoLibc = pkgsHostTarget.binutilsNoLibc;
     libcCross1 = binutilsNoLibc.libc;
     in wrapCCWith {
       cc = gccFun {
