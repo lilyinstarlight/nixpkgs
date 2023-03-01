@@ -138,7 +138,8 @@ in
 
     systemd.services.plymouth-kexec.wantedBy = [ "kexec.target" ];
     systemd.services.plymouth-halt.wantedBy = [ "halt.target" ];
-    systemd.services.plymouth-quit-wait.wantedBy = [ "multi-user.target" ];
+    systemd.services.plymouth-quit-wait.wantedBy = [ "multi-user.target" "rescue.service" "emergency.service" ];
+    systemd.services.plymouth-quit-wait.before = [ "rescue.service" "emergency.service" ];
     systemd.services.plymouth-quit.wantedBy = [ "multi-user.target" ];
     systemd.services.plymouth-poweroff.wantedBy = [ "poweroff.target" ];
     systemd.services.plymouth-reboot.wantedBy = [ "reboot.target" ];
@@ -217,7 +218,8 @@ in
         plymouth-halt.wantedBy = [ "halt.target" ];
         plymouth-kexec.wantedBy = [ "kexec.target" ];
         plymouth-poweroff.wantedBy = [ "poweroff.target" ];
-        plymouth-quit-wait.wantedBy = [ "multi-user.target" ];
+        plymouth-quit-wait.wantedBy = [ "multi-user.target" "rescue.service" "emergency.service" ];
+        plymouth-quit-wait.before = [ "rescue.service" "emergency.service" ];
         plymouth-quit.wantedBy = [ "multi-user.target" ];
         plymouth-read-write.wantedBy = [ "sysinit.target" ];
         plymouth-reboot.wantedBy = [ "reboot.target" ];
