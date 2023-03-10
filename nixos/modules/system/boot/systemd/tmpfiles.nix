@@ -1,10 +1,36 @@
-{ config, lib, pkgs, utils, ... }:
+{ config, options, lib, pkgs, utils, ... }:
 
 with lib;
 
 let
   cfg = config.systemd.tmpfiles;
+  initrdCfg = config.boot.initrd.systemd.tmpfiles;
+
   systemd = config.systemd.package;
+
+  makeRules = { name, rules }: pkgs.writeTextFile {
+    name = "nixos-tmpfiles.d";
+    destination = "/lib/tmpfiles.d/${name}";
+    text = ''
+      # This file is created automatically and should not be modified.
+      # Please change the option ‘systemd.tmpfiles.rules’ instead.
+
+      ${concatStringsSep "\n" rules}
+    '';
+  };
+
+  buildTmpfiles = { packages, postBuild ? "" }: pkgs.symlinkJoin {
+    name = "tmpfiles.d";
+    paths = map (p: p + "/lib/tmpfiles.d") cfg.packages;
+    postBuild = ''
+      for i in $(cat $pathsPath); do
+        (test -d "$i" && test $(ls "$i"/*.conf | wc -l) -ge 1) || (
+          echo "ERROR: The path '$i' from systemd.tmpfiles.packages contains no *.conf files."
+          exit 1
+        )
+      done
+    '' + postBuild;
+  };
 in
 {
   options = {
@@ -38,6 +64,21 @@ in
         and if that does not exist either, the default output will be used.
       '';
     };
+
+    boot.initrd.systemd.tmpfiles.rules = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      example = options.systemd.tmpfiles.rules.example;
+      description = options.systemd.tmpfiles.rules.description;
+    };
+
+    boot.initrd.systemd.tmpfiles.packages = mkOption {
+      type = types.listOf types.package;
+      default = [];
+      example = options.systemd.tmpfiles.packages.example;
+      apply = map getLib;
+      description = options.systemd.tmpfiles.packages.description;
+    };
   };
 
   config = {
@@ -55,17 +96,9 @@ in
     ];
 
     environment.etc = {
-      "tmpfiles.d".source = (pkgs.symlinkJoin {
-        name = "tmpfiles.d";
-        paths = map (p: p + "/lib/tmpfiles.d") cfg.packages;
-        postBuild = ''
-          for i in $(cat $pathsPath); do
-            (test -d "$i" && test $(ls "$i"/*.conf | wc -l) -ge 1) || (
-              echo "ERROR: The path '$i' from systemd.tmpfiles.packages contains no *.conf files."
-              exit 1
-            )
-          done
-        '' + concatMapStrings (name: optionalString (hasPrefix "tmpfiles.d/" name) ''
+      "tmpfiles.d".source = (buildTmpfiles {
+        inherit (cfg) packages;
+        postBuild = concatMapStrings (name: optionalString (hasPrefix "tmpfiles.d/" name) ''
           rm -f $out/${removePrefix "tmpfiles.d/" name}
         '') config.system.build.etc.passthru.targets;
       }) + "/*";
@@ -90,15 +123,9 @@ in
         ln -s "${systemd}/example/tmpfiles.d/x11.conf"
       '')
       # User-specified tmpfiles rules
-      (pkgs.writeTextFile {
-        name = "nixos-tmpfiles.d";
-        destination = "/lib/tmpfiles.d/00-nixos.conf";
-        text = ''
-          # This file is created automatically and should not be modified.
-          # Please change the option ‘systemd.tmpfiles.rules’ instead.
-
-          ${concatStringsSep "\n" cfg.rules}
-        '';
+      (makeRules {
+        name = "00-nixos.conf";
+        inherit (cfg) rules;
       })
     ];
 
@@ -117,5 +144,20 @@ in
       "R! /nix/var/nix/gcroots/tmp           -    -    -    - -"
       "R! /nix/var/nix/temproots             -    -    -    - -"
     ];
+
+    boot.initrd.systemd = {
+      contents = {
+        "/etc/tmpfiles.d".source = buildTmpfiles {
+          inherit (initrdCfg) packages;
+        };
+      };
+
+      tmpfiles.packages = [
+        (makeRules {
+          name = "00-nixos-initrd.conf";
+          inherit (initrdCfg) rules;
+        })
+      ];
+    };
   };
 }

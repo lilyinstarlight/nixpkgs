@@ -459,7 +459,8 @@ in {
       services."systemd-makefs@" = lib.mkIf needMakefs { unitConfig.IgnoreOnIsolate = true; };
       services."systemd-growfs@" = lib.mkIf needGrowfs { unitConfig.IgnoreOnIsolate = true; };
 
-      # make sure all the /dev nodes are set up
+      # make sure tmpfiles and all the /dev nodes are set up
+      services.systemd-tmpfiles-setup.wantedBy = ["sysinit.target"];
       services.systemd-tmpfiles-setup-dev.wantedBy = ["sysinit.target"];
 
       services.initrd-nixos-activation = {
