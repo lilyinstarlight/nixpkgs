@@ -13,7 +13,6 @@ on:
 jobs:
   nixos:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'NixOS'
     steps:
       - uses: actions/checkout@v3
         with:
