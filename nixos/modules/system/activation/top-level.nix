@@ -132,6 +132,7 @@ in
   ];
 
   options = {
+    # TEST
 
     system.boot.loader.id = mkOption {
       internal = true;
