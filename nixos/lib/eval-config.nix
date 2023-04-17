@@ -54,13 +54,15 @@ let
       # they way through, but has the last priority behind everything else.
       nixpkgs.system = lib.mkIf (system != null) (lib.mkDefault system);
 
-      _module.args.pkgs = lib.mkIf (pkgs_ != null) (lib.mkForce pkgs_);
+      nixpkgs.pkgs = lib.mkIf (pkgs_ != null) (lib.mkDefault pkgs_);
     };
   };
 
   withWarnings = x:
     lib.warnIf (evalConfigArgs?extraArgs) "The extraArgs argument to eval-config.nix is deprecated. Please set config._module.args instead."
     lib.warnIf (evalConfigArgs?check) "The check argument to eval-config.nix is deprecated. Please set config._module.check instead."
+    lib.warnIf (pkgs_ != null) "The pkgs argument to eval-config.nix is deprecated. Please configure the built-in pkgs instance by using the config.nixpkgs.* options or set config.nixpkgs.pkgs instead."
+    lib.warnIf (specialArgs?pkgs) "Passing pkgs to the specialArgs argument gives surprising and often unintended behavior. Please configure the built-in pkgs instance by using the config.nixpkgs.* options or set config.nixpkgs.pkgs instead."
     x;
 
   legacyModules =
