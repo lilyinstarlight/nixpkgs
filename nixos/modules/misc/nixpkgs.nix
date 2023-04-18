@@ -60,13 +60,25 @@ let
   # is defined elsewhere does not seem feasible.
   constructedByMe = !opt.pkgs.isDefined;
 
+  hasConfig = cfg.config != {};
+
   hasBuildPlatform = opt.buildPlatform.highestPrio < (mkOptionDefault {}).priority;
   hasHostPlatform = opt.hostPlatform.isDefined;
   hasPlatform = hasHostPlatform || hasBuildPlatform;
 
+  hasSystem = opt.system.highestPrio < (mkDefault {}).priority;
+  hasLocalSystem = opt.localSystem.highestPrio < (mkDefault {}).priority;
+  hasCrossSystem = opt.crossSystem.highestPrio < (mkDefault {}).priority;
+
   # Context for messages
+  configLine = optionalString hasConfig "${showOptionWithDefLocs opt.config}";
+
   hostPlatformLine = optionalString hasHostPlatform "${showOptionWithDefLocs opt.hostPlatform}";
   buildPlatformLine = optionalString hasBuildPlatform "${showOptionWithDefLocs opt.buildPlatform}";
+
+  systemLine = optionalString hasSystem "${showOptionWithDefLocs opt.system}";
+  localSystemLine = optionalString hasLocalSystem "${showOptionWithDefLocs opt.localSystem}";
+  crossSystemLine = optionalString hasCrossSystem "${showOptionWithDefLocs opt.crossSystem}";
 
   legacyOptionsDefined =
     optional (opt.localSystem.highestPrio < (mkDefault {}).priority) opt.system
@@ -371,6 +383,20 @@ in
         '';
       }
     ];
+
+    warnings = let
+      ignoredOptions =
+        lib.optional hasConfig configLine ++
+        lib.optional hasHostPlatform hostPlatformLine ++
+        lib.optional hasBuildPlatform buildPlatformLine ++
+        lib.optional hasSystem systemLine ++
+        lib.optional hasLocalSystem localSystemLine ++
+        lib.optional hasCrossSystem crossSystemLine;
+    in optional (!constructedByMe && ignoredOptions != []) (
+      ''
+        The `${showOption opt.pkgs.loc}` option was set, causing the following option${optionalString (length ignoredOptions > 1) "s"} to be ignored:
+      '' + concatStrings ignoredOptions
+    );
   };
 
   # needs a full nixpkgs path to import nixpkgs
