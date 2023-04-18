@@ -38672,6 +38672,8 @@ with pkgs;
     configuration:
       let
         c = import (path + "/nixos/lib/eval-config.nix") {
+              # system is defined modularly below
+              system = null;
               modules =
                 [(
                   { lib, ... }: {
