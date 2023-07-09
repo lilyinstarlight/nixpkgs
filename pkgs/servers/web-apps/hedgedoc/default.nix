@@ -11,7 +11,6 @@
 }:
 
 mkYarnPackage rec {
-  pname = "hedgedoc";
   version = "1.9.7";
 
   # we use the upstream compiled js files because yarn2nix cannot handle different versions of dependencies
