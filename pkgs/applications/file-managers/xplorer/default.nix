@@ -27,7 +27,6 @@ let
 
   frontend-build = mkYarnPackage {
     inherit version src;
-    pname = "xplorer-ui";
 
     offlineCache = fetchYarnDeps {
       yarnLock = src + "/yarn.lock";
