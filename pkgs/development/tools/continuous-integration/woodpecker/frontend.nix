@@ -3,7 +3,6 @@ let
   common = callPackage ./common.nix { };
 in
 mkYarnPackage {
-  pname = "woodpecker-frontend";
   inherit (common) version;
 
   src = "${common.src}/web";
