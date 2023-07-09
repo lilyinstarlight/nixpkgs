@@ -267,7 +267,7 @@ in rec {
   }@attrs:
     let
       package = lib.importJSON packageJSON;
-      pname = package.name;
+      pname = attrs.pname or package.name;
       safeName = reformatPackageName pname;
       version = attrs.version or package.version;
       baseName = unlessNull name "${safeName}-${version}";
@@ -390,9 +390,9 @@ in rec {
 
       meta = {
         inherit (nodejs.meta) platforms;
-      } // lib.optionalAttrs (package ? description) { inherit (package) description; }
-        // lib.optionalAttrs (package ? homepage) { inherit (package) homepage; }
-        // lib.optionalAttrs (package ? license) { license = getLicenseFromSpdxId package.license; }
+      } // lib.optionalAttrs (!(attrs.meta or {} ? description) && package ? description) { inherit (package) description; }
+        // lib.optionalAttrs (!(attrs.meta or {} ? homepage) && package ? homepage) { inherit (package) homepage; }
+        // lib.optionalAttrs (!(attrs.meta or {} ? license) && package ? license) { license = getLicenseFromSpdxId package.license; }
         // (attrs.meta or {});
     });
 
