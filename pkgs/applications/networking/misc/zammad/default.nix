@@ -93,7 +93,6 @@ let
   };
 
   yarnEnv = yarn2nix-moretea.mkYarnPackage {
-    pname = "${pname}-node-modules";
     inherit version src;
     yarnLock = ./yarn.lock;
     yarnNix = ./yarn.nix;
