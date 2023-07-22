@@ -3,6 +3,7 @@
 , rustPlatform
 , fetchFromGitHub
 , buildNpmPackage
+, makeWrapper
 , perl
 , pkg-config
 , glib
@@ -14,7 +15,7 @@
 }:
 
 let
-  version = "4.7.8";
+  version = "4.8.9";
   geph-meta = with lib; {
     description = "A modular Internet censorship circumvention system designed specifically to deal with national filtering.";
     homepage = "https://geph.io";
@@ -22,7 +23,7 @@ let
     maintainers = with maintainers; [ penalty1083 ];
   };
 in
-{
+rec {
   cli = rustPlatform.buildRustPackage rec {
     pname = "geph4-client";
     inherit version;
@@ -31,10 +32,10 @@ in
       owner = "geph-official";
       repo = pname;
       rev = "v${version}";
-      hash = "sha256-DVGbLyFgraQMSIUAqDehF8DqbnvcaeWbuLVgiSQY3KE=";
+      hash = "sha256-suV2HB2YwbHatluklAHFNLauD8yz4eNQ0er2M9VP7tM=";
     };
 
-    cargoHash = "sha256-uBq6rjUnKEscwhu60HEZffLvuXcArz+AiR52org+qKw=";
+    cargoHash = "sha256-Lx1VKIoWsiq7yju5zH6wny/n/qFWC3MFgqrEt1xtwqA=";
 
     nativeBuildInputs = [ perl ];
 
@@ -43,27 +44,27 @@ in
     };
   };
 
-  gui = stdenvNoCC.mkDerivation rec {
+  gui = stdenvNoCC.mkDerivation (finalAttrs: {
     pname = "geph-gui";
     inherit version;
 
     src = fetchFromGitHub {
       owner = "geph-official";
       repo = "gephgui-pkg";
-      rev = "85a55bfc2f4314d9c49608f252080696b1f8e2a9";
-      hash = "sha256-id/sfaQsF480kUXg//O5rBIciuuhDuXY19FQe1E3OQs=";
+      rev = "1974ce95b908cb16dafa7c19f732ae27ff2928a8";
+      hash = "sha256-4BVplOEBm4kGhG8Dc4uBv76s2Y3wDxHsZQdpvro9hUY=";
       fetchSubmodules = true;
     };
 
     gephgui = buildNpmPackage {
       pname = "gephgui";
-      inherit version src;
+      inherit (finalAttrs) version src;
 
       sourceRoot = "source/gephgui-wry/gephgui";
 
       postPatch = "ln -s ${./package-lock.json} ./package-lock.json";
 
-      npmDepsHash = "sha256-5y6zpMF4M56DiWVhMvjJGsYpVdlJSoWoWyPgLc7hJoo=";
+      npmDepsHash = "sha256-U0fiS0aGOulPE4cQ/nTL3UQGKnvHKlzt+y365DNiyY8=";
 
       installPhase = ''
         runHook preInstall
@@ -75,13 +76,19 @@ in
       '';
     };
 
-    gephgui-wry = rustPlatform.buildRustPackage rec {
+    gephgui-wry = rustPlatform.buildRustPackage {
       pname = "gephgui-wry";
-      inherit version src;
+      inherit (finalAttrs) version src;
 
       sourceRoot = "source/gephgui-wry";
 
-      cargoHash = "sha256-lidlUUfHXKPUlICdaVv/SFlyyWsZ7cYHyTJ3kkMn3L4=";
+      cargoLock = {
+        lockFile = ./Cargo.gui.lock;
+        outputHashes = {
+          "tao-0.5.2" = "sha256-HyQyPRoAHUcgtYgaAW7uqrwEMQ45V+xVSxmlAZJfhv0=";
+          "wry-0.12.2" = "sha256-kTMXvignEF3FlzL0iSlF6zn1YTOCpyRUDN8EHpUS+yI=";
+        };
+      };
 
       nativeBuildInputs = [ pkg-config ];
 
@@ -95,14 +102,19 @@ in
       ];
 
       preBuild = ''
-        ln -s ${gephgui}/dist ./gephgui
+        ln -s ${finalAttrs.gephgui}/dist ./gephgui
       '';
     };
+
+    nativeBuildInputs = [ makeWrapper ];
 
     dontBuild = true;
 
     installPhase = ''
-      install -Dt $out/bin ${gephgui-wry}/bin/gephgui-wry
+      runHook preInstall
+
+      install -Dt $out/bin ${finalAttrs.gephgui-wry}/bin/gephgui-wry
+      wrapProgram $out/bin/gephgui-wry --suffix PATH : ${lib.makeBinPath [ cli ]}
       install -d $out/share/icons/hicolor
       for i in '16' '32' '64' '128' '256'
       do
@@ -113,10 +125,12 @@ in
       done
       install -Dt $out/share/applications flatpak/icons/io.geph.GephGui.desktop
       sed -i -e '/StartupWMClass/s/=.*/=gephgui-wry/' $out/share/applications/io.geph.GephGui.desktop
+
+      runHook postInstall
     '';
 
     meta = geph-meta // {
       license = with lib.licenses; [ unfree ];
     };
-  };
+  });
 }
