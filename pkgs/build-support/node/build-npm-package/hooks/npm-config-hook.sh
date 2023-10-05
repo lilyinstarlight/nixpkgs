@@ -109,6 +109,9 @@ npmConfigHook() {
     rm "$CACHE_MAP_PATH"
     unset CACHE_MAP_PATH
 
+    # Set build NODE_ENV to "production" by default *after* `npm ci` and `npm rebuild` to avoid an implicit `--omit=dev`
+    export NODE_ENV="${NODE_ENV-production}"
+
     if [ -n "${npmRoot-}" ]; then
       popd
     fi
