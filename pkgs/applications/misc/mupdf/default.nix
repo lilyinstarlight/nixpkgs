@@ -155,7 +155,7 @@ stdenv.mkDerivation rec {
     cat >"$out/lib/pkgconfig/mupdf.pc" <<EOF
     prefix=$out
     libdir=$out/lib
-    includedir=$out/include
+    includedir=$dev/include
 
     Name: mupdf
     Description: Library for rendering PDF documents
