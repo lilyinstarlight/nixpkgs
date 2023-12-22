@@ -23,10 +23,12 @@
 , openssl
 , pango
 , Security
+, SystemConfiguration
 , gst-plugins-good
 , nix-update-script
 # specifies a limited subset of plugins to build (the default `null` means all plugins supported on the stdenv platform)
 , plugins ? null
+, enableChecks ? stdenv.hostPlatform == stdenv.buildPlatform
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform && plugins == null
 , hotdoc
@@ -60,8 +62,8 @@ let
     raptorq = [ ];
     reqwest = [ openssl ] ++ lib.optionals stdenv.isDarwin [ Security ];
     rtp = [ ];
-    webrtc = [ gst-plugins-bad openssl ] ++ lib.optionals stdenv.isDarwin [ Security ];
-    webrtchttp = [ gst-plugins-bad openssl ] ++ lib.optionals stdenv.isDarwin [ Security ];
+    webrtc = [ gst-plugins-bad openssl ] ++ lib.optionals stdenv.isDarwin [ Security SystemConfiguration ];
+    webrtchttp = [ gst-plugins-bad openssl ] ++ lib.optionals stdenv.isDarwin [ Security SystemConfiguration ];
 
     # text
     textahead = [ ];
@@ -128,7 +130,7 @@ in
 
 stdenv.mkDerivation rec {
   pname = "gst-plugins-rs";
-  version = "0.11.0+fixup";
+  version = "0.11.3";
 
   outputs = [ "out" "dev" ];
 
@@ -137,7 +139,7 @@ stdenv.mkDerivation rec {
     owner = "gstreamer";
     repo = "gst-plugins-rs";
     rev = version;
-    hash = "sha256-nvDvcY/WyVhcxitcoqgEUT8A1synZqxG2e51ct7Fgss=";
+    hash = "sha256-0N8duv9E21S1l6G/GAJq8NHDePRqca4Jl9fW9PBDmuw=";
     # TODO: temporary workaround for case-insensitivity problems with color-name crate - https://github.com/annymosse/color-name/pull/2
     postFetch = ''
       sedSearch="$(cat <<\EOF | sed -ze 's/\n/\\n/g'
@@ -162,12 +164,12 @@ stdenv.mkDerivation rec {
   cargoDeps = rustPlatform.importCargoLock {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "cairo-rs-0.18.1" = "sha256-k+YIAZXxejbxPQqbUU91qbx2AR98gTrseknLHtNZDEE=";
+      "cairo-rs-0.18.4" = "sha256-HK2DEfFSXxFBq3s4ekWsDJetIoSlmQmb49XUWvA81r0=";
       "color-name-1.1.0" = "sha256-RfMStbe2wX5qjPARHIFHlSDKjzx8DwJ+RjzyltM5K7A=";
       "ffv1-0.0.0" = "sha256-af2VD00tMf/hkfvrtGrHTjVJqbl+VVpLaR0Ry+2niJE=";
       "flavors-0.2.0" = "sha256-zBa0X75lXnASDBam9Kk6w7K7xuH9fP6rmjWZBUB5hxk=";
-      "gdk4-0.7.1" = "sha256-UMGmZivVdvmKRAjIGlj6pjDxwfNJyz8/6C0eYH1OOw4=";
-      "gstreamer-0.21.0" = "sha256-2uilK8wYG8e59fdL3q+kmixc1zw+EBwqvGs/EgfCGhk=";
+      "gdk4-0.7.3" = "sha256-2uJvefWqEregygbJwDue8hXgfq4g6UL4syC6Q2NoMn4=";
+      "gstreamer-0.21.2" = "sha256-pgSoTcvwMvLugbW7jCnI5lAOB69pl9uV6qBkRJhqad0=";
     };
   };
 
@@ -202,36 +204,26 @@ stdenv.mkDerivation rec {
     map (plugin: lib.mesonEnable plugin true) selectedPlugins
   ) ++ [
     (lib.mesonOption "sodium-source" "system")
+    (lib.mesonEnable "tests" enableChecks)
     (lib.mesonEnable "doc" enableDocumentation)
   ];
 
   # turn off all auto plugins since we use a list of plugins we generate
   mesonAutoFeatures = "disabled";
 
-  doCheck = true;
+  doCheck = enableChecks;
 
   # csound lib dir must be manually specified for it to build
-  # webrtc and webrtchttp plugins are the only that need gstreamer-webrtc (from gst-plugins-bad, a heavy set)
   preConfigure = ''
     export CARGO_BUILD_JOBS=$NIX_BUILD_CORES
 
     patchShebangs dependencies.py
   '' + lib.optionalString (lib.elem "csound" selectedPlugins) ''
     export CSOUND_LIB_DIR=${lib.getLib csound}/lib
-  '' + lib.optionalString (lib.mutuallyExclusive [ "webrtc" "webrtchttp" ] selectedPlugins) ''
-    sed -i "/\['gstreamer-webrtc-1\.0', 'gst-plugins-bad', 'gstwebrtc_dep', 'gstwebrtc'\]/d" meson.build
-  '' + lib.optionalString (!gst-plugins-base.glEnabled) ''
-    sed -i "/\['gstreamer-gl-1\.0', 'gst-plugins-base', 'gst_gl_dep', 'gstgl'\]/d" meson.build
   '';
 
-  # run tests ourselves to avoid meson timing out by default
-  checkPhase = ''
-    runHook preCheck
-
-    meson test --no-rebuild --verbose --timeout-multiplier 12
-
-    runHook postCheck
-  '';
+  # give meson longer before timing out for tests
+  mesonCheckFlags = [ "--verbose" "--timeout-multiplier" "12" ];
 
   doInstallCheck = (lib.elem "webp" selectedPlugins) && !stdenv.hostPlatform.isStatic &&
     stdenv.hostPlatform.parsed.kernel.execFormat == lib.systems.parse.execFormats.elf;
