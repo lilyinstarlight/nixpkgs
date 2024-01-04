@@ -556,7 +556,11 @@ class Editor:
         log.info("Chose to run command: %s", command)
         self.nixpkgs = args.nixpkgs
 
-        self.nixpkgs_repo = git.Repo(args.nixpkgs, search_parent_directories=True)
+        try:
+            self.nixpkgs_repo = git.Repo(args.outfile, search_parent_directories=True)
+        except git.InvalidGitRepositoryError as e:
+            print(f"Not in a git repository: {e}", file=sys.stderr)
+            sys.exit(1)
 
         getattr(self, command)(args)
 
@@ -788,16 +792,11 @@ def update_plugins(editor: Editor, args):
     autocommit = not args.no_commit
 
     if autocommit:
-        try:
-            repo = git.Repo(os.getcwd())
-            updated = datetime.now(tz=UTC).strftime('%Y-%m-%d')
-            print(args.outfile)
-            commit(repo,
-                   f"{editor.attr_path}: update on {updated}", [args.outfile]
-                   )
-        except git.InvalidGitRepositoryError as e:
-            print(f"Not in a git repository: {e}", file=sys.stderr)
-            sys.exit(1)
+        updated = datetime.now(tz=UTC).strftime('%Y-%m-%d')
+        print(args.outfile)
+        commit(editor.nixpkgs_repo,
+               f"{editor.attr_path}: update on {updated}", [args.outfile]
+               )
 
     if redirects:
         update()
