@@ -44,11 +44,7 @@
   # Value for npm `--workspace` flag and directory in which the files to be installed are found.
 , npmWorkspace ? null
 , nodejs ? topLevelArgs.nodejs
-, npmDeps ?  fetchNpmDeps {
-  inherit forceGitDeps forceEmptyCache src srcs sourceRoot prePatch patches postPatch;
-  name = "${name}-npm-deps";
-  hash = npmDepsHash;
-}
+, depsExtraArgs ? {}
 , ...
 } @ args:
 
@@ -59,6 +55,12 @@ let
   };
 
   inherit (npmHooks) npmConfigHook npmBuildHook npmInstallHook;
+
+  npmDeps = args.npmDeps or fetchNpmDeps ({
+    inherit forceGitDeps forceEmptyCache src srcs sourceRoot prePatch patches postPatch;
+    name = "${name}-npm-deps";
+    hash = npmDepsHash;
+  } // depsExtraArgs);
 in
 stdenv.mkDerivation (args // {
   inherit npmDeps npmBuildScript;
