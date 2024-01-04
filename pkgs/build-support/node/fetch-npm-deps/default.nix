@@ -151,6 +151,7 @@
     , hash ? ""
     , forceGitDeps ? false
     , forceEmptyCache ? false
+    , nativeBuildInputs ? []
     , ...
     } @ args:
     let
@@ -168,7 +169,7 @@
     stdenvNoCC.mkDerivation (args // {
       inherit name;
 
-      nativeBuildInputs = [ prefetch-npm-deps ];
+      nativeBuildInputs = [ prefetch-npm-deps ] ++ nativeBuildInputs;
 
       buildPhase = ''
         runHook preBuild
