@@ -41,9 +41,7 @@ stdenv.mkDerivation rec {
     ./test_t-verify_double-plaintext.patch
   ];
 
-  outputs = [ "out" "dev" "info" ];
-
-  outputBin = "dev"; # gpgme-config; not so sure about gpgme-tool
+  outputs = [ "bin" "out" "dev" "info" ];
 
   nativeBuildInputs = [
     autoreconfHook
@@ -107,6 +105,10 @@ stdenv.mkDerivation rec {
   doCheck = true;
 
   checkFlags = [ "-C" "tests" ];
+
+  postInstall = ''
+    moveToOutput bin/gpgme-config "$dev"
+  '';
 
   passthru.tests = {
     python = python3.pkgs.gpgme;
