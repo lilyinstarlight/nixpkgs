@@ -28,7 +28,6 @@
 , nix-update-script
 # specifies a limited subset of plugins to build (the default `null` means all plugins supported on the stdenv platform)
 , plugins ? null
-, enableChecks ? stdenv.hostPlatform == stdenv.buildPlatform
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
 , enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform && plugins == null
 , hotdoc
@@ -128,7 +127,7 @@ in
   assert lib.assertMsg (invalidPlugins == [])
     "Invalid gst-plugins-rs plugin${lib.optionalString (lib.length invalidPlugins > 1) "s"}: ${lib.concatStringsSep ", " invalidPlugins}";
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gst-plugins-rs";
   version = "0.11.3";
 
@@ -138,7 +137,7 @@ stdenv.mkDerivation rec {
     domain = "gitlab.freedesktop.org";
     owner = "gstreamer";
     repo = "gst-plugins-rs";
-    rev = version;
+    rev = finalAttrs.version;
     hash = "sha256-0N8duv9E21S1l6G/GAJq8NHDePRqca4Jl9fW9PBDmuw=";
     # TODO: temporary workaround for case-insensitivity problems with color-name crate - https://github.com/annymosse/color-name/pull/2
     postFetch = ''
@@ -204,14 +203,14 @@ stdenv.mkDerivation rec {
     map (plugin: lib.mesonEnable plugin true) selectedPlugins
   ) ++ [
     (lib.mesonOption "sodium-source" "system")
-    (lib.mesonEnable "tests" enableChecks)
+    (lib.mesonEnable "tests" finalAttrs.finalPackage.doCheck)
     (lib.mesonEnable "doc" enableDocumentation)
   ];
 
   # turn off all auto plugins since we use a list of plugins we generate
   mesonAutoFeatures = "disabled";
 
-  doCheck = enableChecks;
+  doCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 
   # csound lib dir must be manually specified for it to build
   preConfigure = ''
@@ -245,4 +244,4 @@ stdenv.mkDerivation rec {
     platforms = platforms.unix;
     maintainers = with maintainers; [ lilyinstarlight ];
   };
-}
+})
