@@ -4,6 +4,7 @@
 , rustPlatform
 , cmake
 , makeBinaryWrapper
+, cosmic-randr
 , cosmic-icons
 , just
 , pkg-config
@@ -69,6 +70,7 @@ rustPlatform.buildRustPackage {
 
   postInstall = ''
     wrapProgram "$out/bin/cosmic-settings" \
+      --prefix PATH : ${lib.makeBinPath [ cosmic-randr ]} \
       --suffix XDG_DATA_DIRS : "${cosmic-icons}/share"
   '';
 
