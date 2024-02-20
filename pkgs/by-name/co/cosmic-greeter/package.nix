@@ -10,6 +10,7 @@
 , libxkbcommon
 , linux-pam
 , wayland
+, coreutils
 , cosmic-settings
 , cosmic-icons
 }:
@@ -60,6 +61,10 @@ rustPlatform.buildRustPackage {
     "daemon-src"
     "target/${rust.lib.toRustTargetSpecShort stdenv.hostPlatform}/release/cosmic-greeter-daemon"
   ];
+
+  postPatch = ''
+    substituteInPlace src/greeter.rs --replace '/usr/bin/env' '${lib.getExe' coreutils "env"}'
+  '';
 
   postInstall = ''
     wrapProgram $out/bin/cosmic-greeter \
