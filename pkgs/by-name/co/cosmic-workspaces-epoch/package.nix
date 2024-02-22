@@ -10,28 +10,31 @@
 , wayland
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-workspaces-epoch";
-  version = "unstable-2023-11-21";
+  version = "0-unstable-2024-02-16";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "f61cdc5759235177521fbb6a39f164b9615adfc0";
-    hash = "sha256-ZPkPqROZXRLLhv6fbjfsov5hIt+D0K7VFajKebHVZaw=";
+    repo = "cosmic-workspaces-epoch";
+    rev = "7e81c9c4c6406ed5da2e3116adbbbdca9ae4958f";
+    hash = "sha256-8AKf+QaRBWsyxvA+D+tJgDYyG6HZt7qSUjdqdmYQhDA=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "accesskit-0.11.0" = "sha256-xVhe6adUb8VmwIKKjHxwCwOo5Y1p3Or3ylcJJdLDrrE=";
+      "accesskit-0.12.2" = "sha256-ksaYMGT/oug7isQY8/1WD97XDUsX2ShBdabUzxWffYw=";
       "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-client-toolkit-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-comp-config-0.1.0" = "sha256-zXxeSc2wkdXKJjWhMPvTU9+IPg23y0vzBRmQ8jx6HXw=";
+      "cosmic-config-0.1.0" = "sha256-ETNVJ4y7EraAlU9XEZGNNPdyWt1WIURr1dSH6hQ0Pos=";
+      "cosmic-text-0.11.1" = "sha256-lyBl0VAzcKBqLeCPrA28VW6O0MWXazJg1b11YuBR65U=";
+      "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
+      "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
       "smithay-client-toolkit-0.18.0" = "sha256-2WbDKlSGiyVmi7blNBr2Aih9FfF2dq/bny57hoA4BrE=";
-      "cosmic-comp-config-0.1.0" = "sha256-NKXIKhZLwZ0BZyGVEplAJ75H5YOsLRNeRrzdhczo3FQ=";
-      "cosmic-config-0.1.0" = "sha256-CxeefjDmEqQkXPhWTomF1yb4GCI9vs3OCvMawBGUgaw=";
-      "cosmic-protocols-0.1.0" = "sha256-st46wmOncJvu0kj6qaot6LT/ojmW/BwXbbGf8s0mdZ8=";
-      "softbuffer-0.3.3" = "sha256-eKYFVr6C1+X6ulidHIu9SP591rJxStxwL9uMiqnXx4k=";
-      "taffy-0.3.11" = "sha256-+gXAFZsS1cWxEisEpP0FMz9q1/UV7L2Ri4ToIP5Bt7s=";
+      "softbuffer-0.4.1" = "sha256-CACVCnyFgefkpDlll6IeaPWB8a3gbF6BW8MnlkytV8o=";
+      "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
     };
   };
 
