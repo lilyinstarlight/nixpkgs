@@ -1467,6 +1467,8 @@ with pkgs;
 
   patchPpdFilesHook = callPackage ../build-support/setup-hooks/patch-ppd-files { };
 
+  wrapCosmicAppsHook = callPackage ../build-support/setup-hooks/wrap-cosmic-apps-hook { };
+
   #package writers
   writers = callPackage ../build-support/writers { };
 
