@@ -7,26 +7,30 @@
 , wayland
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-osd";
-  version = "unstable-2023-11-15";
+  version = "0-unstable-2024-02-07";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "c1d10382dd1132923a4ddc9c86bb89bd9a70cd68";
-    hash = "sha256-KCjWTN6hjbmJU6UfCP5NWbLy2K09+eRY5U4cQ5iV3E4=";
+    repo = "cosmic-osd";
+    rev = "bc35c944e3f4c8bb98b963f8e150830838333ced";
+    hash = "sha256-relTvKbhHLaN6LDcPuRNLFLUzhy1s1A/zv1xGq3MabM=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "accesskit-0.11.0" = "sha256-xVhe6adUb8VmwIKKjHxwCwOo5Y1p3Or3ylcJJdLDrrE=";
-      "cosmic-config-0.1.0" = "sha256-7pfKQvScoahp+Fhv+QfgyIroCyQO6kjXcnTilBL41K8=";
-      "smithay-client-toolkit-0.17.0" = "sha256-vDY4cqz5CZD12twElUWVCsf4N6VO9O+Udl8Dc4arWK4=";
+      "accesskit-0.11.0" = "sha256-SQD6LEqKAI0A7CGLskEGXNeuSZPfVUQBZC9ymsCoVE8=";
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-client-toolkit-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-config-0.1.0" = "sha256-jtWMF9lj5oF1vebLbLPtcpLlmMBohN6OuFIqmgrw+Qk=";
+      "cosmic-text-0.10.0" = "sha256-y9H13YM9EaZVtQ81gm6QERYke3HonPS436dYy578ZiM=";
+      "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
+      "glyphon-0.5.0" = "sha256-YPPRicmBHpNX9JHDWt2x5z4m3VT2caYpo5GwGD18O/o=";
       "smithay-client-toolkit-0.18.0" = "sha256-2WbDKlSGiyVmi7blNBr2Aih9FfF2dq/bny57hoA4BrE=";
-      "softbuffer-0.2.0" = "sha256-VD2GmxC58z7Qfu/L+sfENE+T8L40mvUKKSfgLmCTmjY=";
-      "taffy-0.3.11" = "sha256-0hXOEj6IjSW8e1t+rvxBFX6V9XRum3QO2Des1XlHJEw=";
+      "softbuffer-0.4.1" = "sha256-CACVCnyFgefkpDlll6IeaPWB8a3gbF6BW8MnlkytV8o=";
+      "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
     };
   };
 
