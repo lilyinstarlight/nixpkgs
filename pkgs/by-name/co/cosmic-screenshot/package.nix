@@ -6,18 +6,18 @@
 , pkg-config
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-screenshot";
-  version = "unstable-2023-11-08";
+  version = "0-unstable-2024-02-26";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "b413a7128ddcdfb3c63e84bdade5c5b90b163a9a";
-    hash = "sha256-SDxBBhmnqNDX95Rb7QiI46sAxrfodB5tSq8AbXAU480=";
+    repo = "cosmic-screenshot";
+    rev = "f853446dbe1ff6e124749cdfd0eeb94dc43e884a";
+    hash = "sha256-/sEM+607/W1e7CrrBc0+7Z9Kh5JKypMJi1X6KmFfnFw=";
   };
 
-  cargoHash = "sha256-ZRsAhIWPm38Ys9jM/3yVJLW818lUGLCcSfFZb+UTbnU=";
+  cargoHash = "sha256-YcbZZmApeze64qrB4zUtGYz6Qi31z7gJ1oDFaMUUJIg=";
 
   nativeBuildInputs = [ just pkg-config ];
 
