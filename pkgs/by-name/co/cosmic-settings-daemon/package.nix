@@ -5,18 +5,25 @@
 , udev
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-settings-daemon";
-  version = "unstable-2023-12-29";
+  version = "0-unstable-2024-02-22";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "f7183b68c6ca3f68054b5dd6457b1d5798a75a48";
-    hash = "sha256-Wck0NY6CUjD16gxi74stayiahs4UiqS7iQCkbOXCgKE=";
+    repo = "cosmic-settings-daemon";
+    rev = "bbc896586658846a4e1ec6fc005b66923fa5ff5e";
+    hash = "sha256-W7u7WZL6wPH5fnR/sUC/n1mMxMaQDVpf/FBQmZPhBRs=";
   };
 
-  cargoHash = "sha256-vCs20RdGhsI1+f78KEau7ohtoGTrGP9QH91wooQlgOE=";
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+    outputHashes = {
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-config-0.1.0" = "sha256-P7GCTYfRvqIN8CeheyTELx6fMKCTsaZCp9oEbda2jCo=";
+      "geoclue2-0.1.0" = "sha256-a/cvbB0M9cUd8RP5XxgHRbJ/i/UKAEK4DTwwUU69IuY=";
+    };
+  };
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ udev ];
