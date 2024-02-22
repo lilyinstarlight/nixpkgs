@@ -7,18 +7,18 @@
 , wayland
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-randr";
-  version = "unstable-2023-12-22";
+  version = "0-unstable-2024-01-18";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "8a082103a0365b02fbed2c17c02373eceb7ad4d3";
-    hash = "sha256-LsZpey9OhNq9FTtHXvZXtHyhXttJ+tr5qBS6eSL27dE=";
+    repo = "cosmic-randr";
+    rev = "88c570cf8b88beae1cf4f3e2d412cc64ec49cd7c";
+    hash = "sha256-t1PM/uIM+lbBwgFsKnRiqPZnlb4dxZnN72MfnW0HU/0=";
   };
 
-  cargoHash = "sha256-XpN9X8CZUGOe6mQhWWQy766gyoiTPObKsv9J8xiDvdA=";
+  cargoHash = "sha256-n6DrKVUWUrTV2agUsN5dXAzxECuarVzZ0CYRfJQn1KI=";
 
   postPatch = ''
     substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
