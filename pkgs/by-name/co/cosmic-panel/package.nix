@@ -7,34 +7,36 @@
 , rustPlatform
 , libglvnd
 , libxkbcommon
+, util-linux
 , wayland
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-panel";
-  version = "unstable-2023-11-13";
+  version = "0-unstable-2024-02-26";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-panel";
-    rev = "f07cccbd2dc15ede5aeb7646c61c6f62cb32db0c";
-    sha256 = "sha256-uUq+xElZMcG5SWzha9/8COaenycII5aiXmm7sXGgjXE=";
+    rev = "139845ad6401d8abd03261af94411ef5ff4ae1a4";
+    sha256 = "sha256-JrBmCMa2w74+TQhmXIcrdLn9KQu2V7ifSilmKhSL9a0=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "cosmic-client-toolkit-0.1.0" = "sha256-st46wmOncJvu0kj6qaot6LT/ojmW/BwXbbGf8s0mdZ8=";
-      "cosmic-config-0.1.0" = "sha256-eynEjV7eTRoOUA1v4Ac0FP2h9KQtIDx32WkY0hR4xig=";
-      "cosmic-notifications-util-0.1.0" = "sha256-F1+Y74JdpehRPTANzERwNVE6Q6n5f5HAFtawLQVMFrA=";
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-client-toolkit-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-config-0.1.0" = "sha256-P7GCTYfRvqIN8CeheyTELx6fMKCTsaZCp9oEbda2jCo=";
+      "cosmic-notifications-util-0.1.0" = "sha256-hC76AYUC9Igjx5jFr1157UHVbBT5L9x2YhUslsFaBrc=";
       "launch-pad-0.1.0" = "sha256-tnbSJ/GP9GTnLnikJmvb9XrJSgnUnWjadABHF43L1zc=";
       "smithay-0.3.0" = "sha256-OI+wtDeJ/2bJyiTxL+F53j1CWnZ0aH7XjUmM6oN45Ow=";
-      "smithay-client-toolkit-0.18.0" = "sha256-GhCZ7Eb6q7SwA+NeHSiHwx/Fnrw3R6Zm5N2meMOJ2/4=";
-      "xdg-shell-wrapper-0.1.0" = "sha256-8+RXbYiYeoIGUOsJ7yCc2iYtIGKIwDCzSdq9ISuWxIE=";
+      "smithay-client-toolkit-0.18.0" = "sha256-2WbDKlSGiyVmi7blNBr2Aih9FfF2dq/bny57hoA4BrE=";
+      "xdg-shell-wrapper-0.1.0" = "sha256-cQ0JMfxpDdPtBF6IxgF6cCey/vxqGfXC4dPgs4u73tQ=";
     };
   };
 
-  nativeBuildInputs = [ just pkg-config ];
+  nativeBuildInputs = [ just pkg-config util-linux ];
   buildInputs = [ libglvnd libxkbcommon wayland ];
 
   dontUseJustBuild = true;
