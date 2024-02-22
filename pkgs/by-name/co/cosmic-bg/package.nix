@@ -3,28 +3,30 @@
 , fetchFromGitHub
 , rustPlatform
 , just
+, nasm
 , pkg-config
 , makeBinaryWrapper
 , libxkbcommon
 , wayland
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-bg";
-  version = "unstable-2023-10-10";
+  version = "0-unstable-2024-02-01";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "6a6fe4e387e46c2e159df56a9768220a6269ccf4";
-    hash = "sha256-fdRFndhwISmbTqmXfekFqh+Wrtdjg3vSZut4IAQUBbA=";
+    repo = "cosmic-bg";
+    rev = "a1f0552187a9e9c436b392908b76866dea482345";
+    hash = "sha256-2P2NcgDmytvBCMbG8isfZrX+JirMwAz8qjW3BhfhebI=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "cosmic-config-0.1.0" = "sha256-vM5iIr71zg8OWShuoyQI+pV9C5dPXnvkfEVYAg0XAH4=";
-      "smithay-client-toolkit-0.17.0" = "sha256-XXfXRXeEm2LCLTfyd74PYuLmTtLu50pcXKld/6H4juA=";
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-config-0.1.0" = "sha256-UTxeUjyiTZ8aE75ccHbSNj+ZhF5ncx0LUv3nlsqj6x0=";
+      "smithay-client-toolkit-0.18.0" = "sha256-7s5XPmIflUw2qrKRAZUz30cybYKvzD5Hu4ViDpzGC3s=";
     };
   };
 
@@ -32,7 +34,7 @@ rustPlatform.buildRustPackage rec {
     substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
   '';
 
-  nativeBuildInputs = [ just pkg-config makeBinaryWrapper ];
+  nativeBuildInputs = [ just nasm pkg-config makeBinaryWrapper ];
   buildInputs = [ libxkbcommon wayland ];
 
   dontUseJustBuild = true;
