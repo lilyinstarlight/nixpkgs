@@ -16,33 +16,38 @@
 , useXWayland ? true
 , systemd
 , useSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd
+, cosmic-settings
+, cosmic-icons
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-comp";
-  version = "unstable-2023-11-13";
+  version = "0-unstable-2024-02-24";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-comp";
-    rev = "d051d141979820f50b75bd686c745fb7f84fcd05";
-    hash = "sha256-8okRiVVPzmuPJjnv1YoQPQFI8g0j1DQhwUoO51dHgGA=";
+    rev = "e83796680f66be0b19905bd895e8df2815a6d961";
+    hash = "sha256-Lj24AkdLHOICHnBtrVCTKaBiySViTCxEWl4Ry8nfiXg=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "cosmic-config-0.1.0" = "sha256-5WajbfcfCc0ZRpJfysqEydthOsF04ipb35QVWuWKrEs=";
-      "cosmic-protocols-0.1.0" = "sha256-st46wmOncJvu0kj6qaot6LT/ojmW/BwXbbGf8s0mdZ8=";
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-config-0.1.0" = "sha256-uo4So9I/jD3LPfigyKwESUdZiK1wqm7rg9wYwyv4uKc=";
+      "cosmic-protocols-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-text-0.10.0" = "sha256-S0GkKUiUsSkL1CZHXhtpQy7Mf5+6fqNuu33RRtxG3mE=";
+      "glyphon-0.4.1" = "sha256-mwJXi63LTBIVFrFcywr/NeOJKfMjQaQkNl3CSdEgrZc=";
       "id_tree-1.8.0" = "sha256-uKdKHRfPGt3vagOjhnri3aYY5ar7O3rp2/ivTfM2jT0=";
-      "smithay-0.3.0" = "sha256-e6BSrsrVSBcOuF8m21m74h7DWZnYHGIYs/4D4ABvqNM=";
+      "smithay-0.3.0" = "sha256-6nhOQMsiogHt6Bw4zSSSbJXDlKTJdz+TT3yN5aKxcgU=";
       "smithay-egui-0.1.0" = "sha256-FcSoKCwYk3okwQURiQlDUcfk9m/Ne6pSblGAzHDaVHg=";
-      "softbuffer-0.2.0" = "sha256-VD2GmxC58z7Qfu/L+sfENE+T8L40mvUKKSfgLmCTmjY=";
-      "taffy-0.3.11" = "sha256-0hXOEj6IjSW8e1t+rvxBFX6V9XRum3QO2Des1XlHJEw=";
+      "softbuffer-0.3.3" = "sha256-eKYFVr6C1+X6ulidHIu9SP591rJxStxwL9uMiqnXx4k=";
+      "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
     };
   };
 
-  separateDebugInfo = true;
+  #separateDebugInfo = true;
 
   nativeBuildInputs = [ makeBinaryWrapper pkg-config ];
   buildInputs = [
@@ -77,7 +82,8 @@ rustPlatform.buildRustPackage {
   '' + lib.optionalString useXWayland ''
     wrapProgramArgs+=(--prefix PATH : ${lib.makeBinPath [ xwayland ]})
   '' + ''
-    wrapProgram $out/bin/cosmic-comp "''${wrapProgramArgs[@]}"
+    wrapProgram $out/bin/cosmic-comp "''${wrapProgramArgs[@]}" \
+      --suffix XDG_DATA_DIRS : ${cosmic-settings}/share:${cosmic-icons}/share
   '';
 
   meta = with lib; {
