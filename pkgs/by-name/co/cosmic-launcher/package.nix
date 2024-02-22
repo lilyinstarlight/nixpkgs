@@ -12,29 +12,33 @@
 , intltool
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-launcher";
-  version = "unstable-2023-12-13";
+  version = "0-unstable-2024-02-16";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "d5098e3674d1044645db256347f232fb33334376";
-    sha256 = "sha256-2nbjw6zynlmzoMBZhnQSnnQIgxkyq8JA+VSiQJHU6JQ=";
+    repo = "cosmic-launcher";
+    rev = "fa00cf18a4928bfe73cef7334cf0afeae3218de6";
+    sha256 = "sha256-NkxQX1OdZ61OCOKzYftVCVnSv9yxMQfzcTZKGrOJWMg=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "accesskit-0.11.0" = "sha256-xVhe6adUb8VmwIKKjHxwCwOo5Y1p3Or3ylcJJdLDrrE=";
+      "accesskit-0.12.2" = "sha256-ksaYMGT/oug7isQY8/1WD97XDUsX2ShBdabUzxWffYw=";
       "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
-      "cosmic-config-0.1.0" = "sha256-dvBYNtzKnbMTixe9hMNnEyiIsWd0KBCeVVbc19DPLMQ=";
-      "cosmic-client-toolkit-0.1.0" = "sha256-AEgvF7i/OWPdEMi8WUaAg99igBwE/AexhAXHxyeJMdc=";
-      "glyphon-0.3.0" = "sha256-Uw1zbHVAjB3pUfUd8GnFUnske3Gxs+RktrbaFJfK430=";
-      "pop-launcher-1.2.2" = "sha256-yELJN6wnJxnHiF3r45nwN2UCpMQrpBJfUg2yGFa7jBY=";
+      "cosmic-client-toolkit-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-config-0.1.0" = "sha256-P7GCTYfRvqIN8CeheyTELx6fMKCTsaZCp9oEbda2jCo=";
+      "cosmic-settings-daemon-0.1.0" = "sha256-z/dvRyc3Zc1fAQh2HKk6NI6QSDpNqarqslwszjU+0nc=";
+      "cosmic-text-0.11.2" = "sha256-EG0jERREWR4MBWKgFmE/t6SpTTQRXK76PPa7+/TAKOA=";
+      "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
+      "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
+      "pop-launcher-1.2.2" = "sha256-tQtjPwSBKrT1Uq62hQLR+MBbn6UJ3OSlkNSSNCJcYas=";
       "smithay-client-toolkit-0.18.0" = "sha256-2WbDKlSGiyVmi7blNBr2Aih9FfF2dq/bny57hoA4BrE=";
+      "softbuffer-0.4.1" = "sha256-a0bUFz6O8CWRweNt/OxTvflnPYwO5nm6vsyc/WcXyNg=";
+      "switcheroo-control-0.1.0" = "sha256-ztZ5HD1hEOvsUSn94ZbbJ6SY9Jbsm8iGHR70GuAnEaQ=";
       "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
-      "softbuffer-0.3.3" = "sha256-eKYFVr6C1+X6ulidHIu9SP591rJxStxwL9uMiqnXx4k=";
     };
   };
 
