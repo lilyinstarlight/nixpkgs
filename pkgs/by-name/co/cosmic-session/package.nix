@@ -9,13 +9,13 @@
   stdenv,
   xdg-desktop-portal-cosmic,
 }:
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-session";
-  version = "0-unstable-2024-01-17";
+  version = "0-unstable-2024-01-16";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
+    repo = "cosmic-session";
     rev = "8e73c0f6940288c4a24a102a7ba9f20eb6bd754f";
     sha256 = "sha256-plglQ9i+kcG70v9ElCzwNMhO1xcuEAQiO0DeZfRjbcg=";
   };
