@@ -1,13 +1,11 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
+, wrapCosmicAppsHook
 , just
 , nasm
 , pkg-config
-, makeBinaryWrapper
-, libxkbcommon
-, wayland
+, stdenv
 }:
 
 rustPlatform.buildRustPackage {
@@ -30,12 +28,7 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  nativeBuildInputs = [ just nasm pkg-config makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon wayland ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just nasm pkg-config ];
 
   dontUseJustBuild = true;
 
@@ -47,11 +40,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-bg"
   ];
-
-  postInstall = ''
-    wrapProgram $out/bin/cosmic-bg \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [wayland]}"
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-bg";

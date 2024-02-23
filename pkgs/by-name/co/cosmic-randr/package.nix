@@ -1,7 +1,7 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
+, stdenv
 , just
 , pkg-config
 , wayland
@@ -19,10 +19,6 @@ rustPlatform.buildRustPackage {
   };
 
   cargoHash = "sha256-n6DrKVUWUrTV2agUsN5dXAzxECuarVzZ0CYRfJQn1KI=";
-
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
 
   nativeBuildInputs = [ just pkg-config ];
   buildInputs = [ wayland ];

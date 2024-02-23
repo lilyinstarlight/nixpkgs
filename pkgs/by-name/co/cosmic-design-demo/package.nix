@@ -1,17 +1,14 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
+, wrapCosmicAppsHook
 , cmake
-, just
-, pkg-config
 , expat
-, libxkbcommon
 , fontconfig
 , freetype
-, wayland
-, makeBinaryWrapper
-, cosmic-icons
+, just
+, pkg-config
+, stdenv
 }:
 
 rustPlatform.buildRustPackage {
@@ -44,8 +41,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ cmake just pkg-config makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon expat fontconfig freetype wayland ];
+  nativeBuildInputs = [ wrapCosmicAppsHook cmake just pkg-config ];
+  buildInputs = [ expat fontconfig freetype ];
 
   dontUseJustBuild = true;
 
@@ -58,12 +55,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-design-demo"
   ];
-
-  postInstall = ''
-    wrapProgram "$out/bin/cosmic-design-demo" \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [wayland]}" \
-      --suffix XDG_DATA_DIRS : "${cosmic-icons}/share"
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-design-demo";

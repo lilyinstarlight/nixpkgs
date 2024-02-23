@@ -1,19 +1,15 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , fetchpatch
-, rust
 , rustPlatform
+, wrapCosmicAppsHook
 , cmake
-, just
-, pkg-config
-, makeBinaryWrapper
-, libxkbcommon
-, linux-pam
-, wayland
 , coreutils
-, cosmic-settings
-, cosmic-icons
+, just
+, linux-pam
+, pkg-config
+, rust
+, stdenv
 }:
 
 rustPlatform.buildRustPackage {
@@ -54,8 +50,8 @@ rustPlatform.buildRustPackage {
     })
   ];
 
-  nativeBuildInputs = [ rustPlatform.bindgenHook cmake just pkg-config makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon wayland linux-pam ];
+  nativeBuildInputs = [ wrapCosmicAppsHook rustPlatform.bindgenHook cmake just pkg-config ];
+  buildInputs = [ linux-pam ];
 
   cargoBuildFlags = [ "--all" ];
 
@@ -75,15 +71,6 @@ rustPlatform.buildRustPackage {
 
   postPatch = ''
     substituteInPlace src/greeter.rs --replace '/usr/bin/env' '${lib.getExe' coreutils "env"}'
-  '';
-
-  postInstall = ''
-    wrapProgram $out/bin/cosmic-greeter \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ wayland ]}" \
-      --suffix XDG_DATA_DIRS : ${cosmic-settings}/share:${cosmic-icons}/share
-
-    wrapProgram $out/bin/cosmic-greeter-daemon \
-      --suffix XDG_DATA_DIRS : ${cosmic-settings}/share:${cosmic-icons}/share
   '';
 
   meta = with lib; {

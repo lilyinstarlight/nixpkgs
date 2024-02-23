@@ -1,17 +1,16 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
+, wrapCosmicAppsHook
+, dbus
+, glib
 , just
 , libinput
 , pkg-config
-, util-linux
-, dbus
-, glib
-, libxkbcommon
 , pulseaudio
+, stdenv
 , udev
-, wayland
+, util-linux
 }:
 
 rustPlatform.buildRustPackage {
@@ -48,8 +47,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ just pkg-config util-linux ];
-  buildInputs = [ dbus glib libinput libxkbcommon pulseaudio udev wayland ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just pkg-config util-linux ];
+  buildInputs = [ dbus glib libinput pulseaudio udev ];
 
   dontUseJustBuild = true;
 
@@ -57,14 +56,6 @@ rustPlatform.buildRustPackage {
     "--set" "prefix" (placeholder "out")
     "--set" "target" "${stdenv.hostPlatform.rust.cargoShortTarget}/release"
   ];
-
-  # Force linking to libwayland-client, which is always dlopen()ed.
-  "CARGO_TARGET_${stdenv.hostPlatform.rust.cargoEnvVarTarget}_RUSTFLAGS" =
-    map (a: "-C link-arg=${a}") [
-      "-Wl,--push-state,--no-as-needed"
-      "-lwayland-client"
-      "-Wl,--pop-state"
-    ];
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-applets";

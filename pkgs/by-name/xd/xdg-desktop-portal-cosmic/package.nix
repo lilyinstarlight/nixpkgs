@@ -1,12 +1,10 @@
 { lib
 , rustPlatform
 , fetchFromGitHub
+, wrapCosmicAppsHook
 , pkg-config
 , mesa
-, libglvnd
-, libxkbcommon
 , pipewire
-, wayland
 , gst_all_1
 }:
 
@@ -42,19 +40,9 @@ rustPlatform.buildRustPackage {
 
   separateDebugInfo = true;
 
-  nativeBuildInputs = [ rustPlatform.bindgenHook pkg-config ];
-  buildInputs = [ libglvnd libxkbcommon mesa pipewire wayland ];
+  nativeBuildInputs = [ wrapCosmicAppsHook rustPlatform.bindgenHook pkg-config ];
+  buildInputs = [ mesa pipewire ];
   checkInputs = [ gst_all_1.gstreamer ];
-
-  # Force linking to libEGL, which is always dlopen()ed, and to
-  # libwayland-client, which is always dlopen()ed except by the
-  # obscure winit backend.
-  RUSTFLAGS = map (a: "-C link-arg=${a}") [
-    "-Wl,--push-state,--no-as-needed"
-    "-lEGL"
-    "-lwayland-client"
-    "-Wl,--pop-state"
-  ];
 
   postInstall = ''
     mkdir -p $out/share/{dbus-1/services,xdg-desktop-portal/portals}

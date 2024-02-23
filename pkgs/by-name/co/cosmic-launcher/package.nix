@@ -1,15 +1,13 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
-, just
-, pkg-config
-, makeBinaryWrapper
-, libxkbcommon
-, wayland
+, wrapCosmicAppsHook
 , appstream-glib
 , desktop-file-utils
 , intltool
+, just
+, pkg-config
+, stdenv
 }:
 
 rustPlatform.buildRustPackage {
@@ -42,8 +40,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ just pkg-config makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon wayland appstream-glib desktop-file-utils intltool ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just pkg-config ];
+  buildInputs = [ appstream-glib desktop-file-utils intltool ];
 
   dontUseJustBuild = true;
 
@@ -56,16 +54,7 @@ rustPlatform.buildRustPackage {
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-launcher"
   ];
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  postInstall = ''
-    wrapProgram $out/bin/cosmic-launcher \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [wayland]}"
-  '';
-
-  RUSTFLAGS = "--cfg tokio_unstable";
+  env."CARGO_TARGET_${stdenv.hostPlatform.rust.cargoEnvVarTarget}_RUSTFLAGS" = "--cfg tokio_unstable";
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-launcher";

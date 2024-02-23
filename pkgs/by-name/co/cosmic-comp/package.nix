@@ -1,23 +1,17 @@
 { lib
-, stdenv
-, rustPlatform
 , fetchFromGitHub
-, makeBinaryWrapper
-, pkg-config
+, rustPlatform
+, wrapCosmicAppsHook
 , libinput
-, libglvnd
-, libxkbcommon
 , mesa
+, pkg-config
 , seatd
+, stdenv
 , udev
 , xwayland
-, wayland
-, xorg
 , useXWayland ? true
 , systemd
 , useSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd
-, cosmic-settings
-, cosmic-icons
 }:
 
 rustPlatform.buildRustPackage {
@@ -47,46 +41,26 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  #separateDebugInfo = true;
+  separateDebugInfo = true;
 
-  nativeBuildInputs = [ makeBinaryWrapper pkg-config ];
+  nativeBuildInputs = [ wrapCosmicAppsHook pkg-config ];
   buildInputs = [
-      libglvnd
-      libinput
-      libxkbcommon
-      mesa
-      seatd
-      udev
-      wayland
-    ] ++ lib.optional useSystemd systemd;
+    libinput
+    mesa
+    seatd
+    udev
+  ] ++ lib.optional useSystemd systemd;
 
-  # Only default feature is systemd
+  # only default feature is systemd
   buildNoDefaultFeatures = !useSystemd;
 
-  # Force linking to libEGL, which is always dlopen()ed, and to
-  # libwayland-client, which is always dlopen()ed except by the
-  # obscure winit backend.
-  RUSTFLAGS = map (a: "-C link-arg=${a}") [
-    "-Wl,--push-state,--no-as-needed"
-    "-lEGL"
-    "-lwayland-client"
-    "-Wl,--pop-state"
-  ];
-
-  # These libraries are only used by the X11 backend, which will not
-  # be the common case, so just make them available, don't link them.
   postInstall = ''
     mkdir -p $out/etc/cosmic-comp
     cp config.ron $out/etc/cosmic-comp/config.ron
-    wrapProgramArgs=(--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [
-        xorg.libX11 xorg.libXcursor xorg.libXi xorg.libXrandr
-    ]})
+
+    cosmicAppsWrapperArgs+=(--suffix XDG_CONFIG_DIRS : $out/etc)
   '' + lib.optionalString useXWayland ''
-    wrapProgramArgs+=(--prefix PATH : ${lib.makeBinPath [ xwayland ]})
-  '' + ''
-    wrapProgram $out/bin/cosmic-comp "''${wrapProgramArgs[@]}" \
-      --suffix XDG_CONFIG_DIRS : $out/etc \
-      --suffix XDG_DATA_DIRS : ${cosmic-settings}/share:${cosmic-icons}/share
+    cosmicAppsWrapperArgs+=(--prefix PATH : ${lib.makeBinPath [ xwayland ]})
   '';
 
   meta = with lib; {

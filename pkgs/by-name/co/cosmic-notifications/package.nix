@@ -1,16 +1,14 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
-, just
-, which
-, pkg-config
-, makeBinaryWrapper
-, libxkbcommon
-, wayland
+, wrapCosmicAppsHook
 , appstream-glib
 , desktop-file-utils
 , intltool
+, just
+, pkg-config
+, stdenv
+, which
 }:
 
 rustPlatform.buildRustPackage {
@@ -44,12 +42,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  nativeBuildInputs = [ just which pkg-config makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon wayland appstream-glib desktop-file-utils intltool ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just which pkg-config ];
+  buildInputs = [ appstream-glib desktop-file-utils intltool ];
 
   dontUseJustBuild = true;
 
@@ -61,11 +55,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-notifications"
   ];
-
-  postInstall = ''
-    wrapProgram $out/bin/cosmic-notifications \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [wayland]}"
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-notifications";

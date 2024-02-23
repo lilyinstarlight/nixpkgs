@@ -1,13 +1,11 @@
 { lib
 , rustPlatform
 , fetchFromGitHub
+, wrapCosmicAppsHook
 , pkg-config
-, libxkbcommon
 , libinput
-, libglvnd
 , mesa
 , udev
-, wayland
 }:
 
 rustPlatform.buildRustPackage {
@@ -38,20 +36,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  separateDebugInfo = true;
-
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ libxkbcommon libinput libglvnd mesa udev wayland ];
-
-  # Force linking to libEGL, which is always dlopen()ed, and to
-  # libwayland-client, which is always dlopen()ed except by the
-  # obscure winit backend.
-  RUSTFLAGS = map (a: "-C link-arg=${a}") [
-    "-Wl,--push-state,--no-as-needed"
-    "-lEGL"
-    "-lwayland-client"
-    "-Wl,--pop-state"
-  ];
+  nativeBuildInputs = [ wrapCosmicAppsHook pkg-config ];
+  buildInputs = [ libinput mesa udev ];
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-workspaces-epoch";

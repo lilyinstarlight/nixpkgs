@@ -1,24 +1,16 @@
 {
   lib,
-  stdenv,
   fetchFromGitHub,
   rustPlatform,
-  cmake,
-  makeBinaryWrapper,
-  cosmic-icons,
+  wrapCosmicAppsHook,
+  fontconfig,
+  freetype,
   glib,
   gtk3,
   just,
-  pkg-config,
-  libglvnd,
-  libxkbcommon,
   libinput,
-  fontconfig,
-  freetype,
-  mesa,
-  wayland,
-  xorg,
-  vulkan-loader,
+  pkg-config,
+  stdenv,
 }:
 
 rustPlatform.buildRustPackage {
@@ -50,22 +42,13 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  nativeBuildInputs = [ just pkg-config makeBinaryWrapper ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just pkg-config ];
   buildInputs = [
-    libxkbcommon
     glib
     gtk3
-    xorg.libX11
     libinput
-    libglvnd
     fontconfig
     freetype
-    wayland
-    vulkan-loader
   ];
 
   dontUseJustBuild = true;
@@ -78,25 +61,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-edit"
   ];
-
-  # Force linking to libEGL, which is always dlopen()ed, and to
-  # libwayland-client, which is always dlopen()ed except by the
-  # obscure winit backend.
-  RUSTFLAGS = map (a: "-C link-arg=${a}") [
-    "-Wl,--push-state,--no-as-needed"
-    "-lEGL"
-    "-lwayland-client"
-    "-Wl,--pop-state"
-  ];
-
-  # LD_LIBRARY_PATH can be removed once tiny-xlib is bumped above 0.2.2
-  postInstall = ''
-    wrapProgram "$out/bin/${pname}" \
-      --suffix XDG_DATA_DIRS : "${cosmic-icons}/share" \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [
-        xorg.libX11 xorg.libXcursor xorg.libXi xorg.libXrandr vulkan-loader mesa.drivers
-      ]}
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-edit";

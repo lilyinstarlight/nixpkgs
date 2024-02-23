@@ -1,14 +1,9 @@
 { lib
-, stdenv
 , fetchFromGitHub
 , rustPlatform
-, makeBinaryWrapper
-, cosmic-icons
+, wrapCosmicAppsHook
 , just
-, pkg-config
-, libxkbcommon
-, wayland
-, xorg
+, stdenv
 }:
 
 rustPlatform.buildRustPackage {
@@ -38,12 +33,7 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  nativeBuildInputs = [ just pkg-config makeBinaryWrapper ];
-  buildInputs = [ wayland ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just ];
 
   dontUseJustBuild = true;
 
@@ -55,13 +45,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-files"
   ];
-
-  # LD_LIBRARY_PATH can be removed once tiny-xlib is bumped above 0.2.2
-  postInstall = ''
-    wrapProgram "$out/bin/cosmic-files" \
-      --suffix XDG_DATA_DIRS : "${cosmic-icons}/share" \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ xorg.libX11 xorg.libXcursor xorg.libXrandr xorg.libXi wayland libxkbcommon ]}
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-files";

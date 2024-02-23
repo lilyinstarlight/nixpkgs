@@ -1,10 +1,9 @@
 { lib
 , fetchFromGitHub
 , rustPlatform
+, wrapCosmicAppsHook
 , pkg-config
-, libxkbcommon
 , udev
-, wayland
 }:
 
 rustPlatform.buildRustPackage {
@@ -34,8 +33,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ libxkbcommon wayland udev ];
+  nativeBuildInputs = [ wrapCosmicAppsHook pkg-config ];
+  buildInputs = [ udev ];
 
   env.POLKIT_AGENT_HELPER_1 = "/run/wrappers/bin/polkit-agent-helper-1";
 

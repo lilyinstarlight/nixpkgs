@@ -1,12 +1,10 @@
 { lib
 , fetchFromGitHub
-, stdenv
 , rustPlatform
+, wrapCosmicAppsHook
 , just
 , pkg-config
-, makeBinaryWrapper
-, libxkbcommon
-, wayland
+, stdenv
 }:
 
 rustPlatform.buildRustPackage {
@@ -38,8 +36,7 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ just pkg-config makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon wayland ];
+  nativeBuildInputs = [ wrapCosmicAppsHook just pkg-config ];
 
   dontUseJustBuild = true;
 
@@ -51,15 +48,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-app-library"
   ];
-
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  postInstall = ''
-    wrapProgram $out/bin/cosmic-app-library \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [wayland]}"
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-applibrary";

@@ -30,17 +30,12 @@ rustPlatform.buildRustPackage {
 
   postPatch = ''
     substituteInPlace Justfile \
-        --replace '#!/usr/bin/env' "#!$(command -v env)" \
-        --replace 'target/release/cosmic-session' "target/${
-          rust.lib.toRustTargetSpecShort stdenv.hostPlatform
-        }/release/cosmic-session"
+        --replace 'target/release/cosmic-session' "target/${rust.lib.toRustTargetSpecShort stdenv.hostPlatform}/release/cosmic-session"
     substituteInPlace data/start-cosmic \
-        --replace '#!/bin/bash' "#!${lib.getBin bash}/bin/bash" \
-        --replace '/usr/bin/cosmic-session' "$out/bin/cosmic-session" \
-        --replace '/usr/bin/dbus-run-session' "${
-          lib.getBin dbus
-        }/bin/dbus-run-session"
-    substituteInPlace data/cosmic.desktop --replace '/usr/bin/start-cosmic' "$out/bin/start-cosmic"
+        --replace '#!/bin/bash' '#!${lib.getExe bash}' \
+        --replace '/usr/bin/cosmic-session' '${placeholder "out"}/bin/cosmic-session' \
+        --replace '/usr/bin/dbus-run-session' '${lib.getExe' dbus "dbus-run-session"}'
+    substituteInPlace data/cosmic.desktop --replace '/usr/bin/start-cosmic' '${placeholder "out"}/bin/start-cosmic'
   '';
 
   nativeBuildInputs = [ just ];

@@ -2,20 +2,20 @@
 , stdenv
 , fetchFromGitHub
 , rustPlatform
-, cmake
 , makeBinaryWrapper
-, cosmic-randr
+, cmake
 , cosmic-icons
-, just
-, pkg-config
-, util-linux
-, libxkbcommon
-, libinput
+, cosmic-randr
+, expat
 , fontconfig
 , freetype
-, wayland
-, expat
+, just
+, libinput
+, libxkbcommon
+, pkg-config
 , udev
+, util-linux
+, wayland
 }:
 
 rustPlatform.buildRustPackage {
@@ -50,12 +50,8 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  nativeBuildInputs = [ cmake just pkg-config util-linux makeBinaryWrapper ];
-  buildInputs = [ libxkbcommon libinput fontconfig freetype wayland expat udev ];
+  nativeBuildInputs = [ makeBinaryWrapper cmake just pkg-config util-linux ];
+  buildInputs = [ expat fontconfig freetype libxkbcommon libinput udev wayland ];
 
   dontUseJustBuild = true;
 
@@ -70,8 +66,8 @@ rustPlatform.buildRustPackage {
 
   postInstall = ''
     wrapProgram "$out/bin/cosmic-settings" \
-      --prefix PATH : ${lib.makeBinPath [ cosmic-randr ]} \
-      --suffix XDG_DATA_DIRS : "$out/share:${cosmic-icons}/share"
+      --prefix PATH : '${lib.makeBinPath [ cosmic-randr ]}' \
+      --suffix XDG_DATA_DIRS : '${placeholder "out"}/share:${cosmic-icons}/share'
   '';
 
   meta = with lib; {

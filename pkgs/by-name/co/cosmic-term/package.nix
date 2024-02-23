@@ -1,20 +1,13 @@
 { lib
-, cosmic-icons
 , fetchFromGitHub
+, wrapCosmicAppsHook
 , fontconfig
 , freetype
 , just
-, libglvnd
 , libinput
-, libxkbcommon
-, makeBinaryWrapper
-, mesa
 , pkg-config
 , rustPlatform
 , stdenv
-, vulkan-loader
-, wayland
-, xorg
 }:
 
 rustPlatform.buildRustPackage {
@@ -45,25 +38,16 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
   nativeBuildInputs = [
+    wrapCosmicAppsHook
     just
     pkg-config
-    makeBinaryWrapper
   ];
 
   buildInputs = [
     fontconfig
     freetype
-    libglvnd
     libinput
-    libxkbcommon
-    vulkan-loader
-    wayland
-    xorg.libX11
   ];
 
   dontUseJustBuild = true;
@@ -76,31 +60,6 @@ rustPlatform.buildRustPackage {
     "bin-src"
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-term"
   ];
-
-  # Force linking to libEGL, which is always dlopen()ed, and to
-  # libwayland-client, which is always dlopen()ed except by the
-  # obscure winit backend.
-  RUSTFLAGS = map (a: "-C link-arg=${a}") [
-    "-Wl,--push-state,--no-as-needed"
-    "-lEGL"
-    "-lwayland-client"
-    "-Wl,--pop-state"
-  ];
-
-  # LD_LIBRARY_PATH can be removed once tiny-xlib is bumped above 0.2.2
-  postInstall = ''
-    wrapProgram "$out/bin/${pname}" \
-      --suffix XDG_DATA_DIRS : "${cosmic-icons}/share" \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [
-        libxkbcommon
-        mesa.drivers
-        vulkan-loader
-        xorg.libX11
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXrandr
-      ]}
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-term";
