@@ -21,32 +21,32 @@
   vulkan-loader,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-edit";
-  version = "0-unstable-2024-01-19";
+  version = "0-unstable-2024-02-26";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "b97eb0603bf6c7e168fc6e17aa779af1f105b9ee";
-    hash = "sha256-oprqM3QTewC/L/KOQ4uT81dPLqjP+Kp+wxgkY8l1Nc8=";
+    repo = "cosmic-edit";
+    rev = "944c75ca8a78f1f4ecbc3e4f1a8c68f28c168dce";
+    hash = "sha256-i7x9Qis9SqbED4PUJQrdmElplYVaAQ5h5veVR5yB5Rk=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "accesskit-0.11.0" = "sha256-xVhe6adUb8VmwIKKjHxwCwOo5Y1p3Or3ylcJJdLDrrE=";
+      "accesskit-0.12.2" = "sha256-ksaYMGT/oug7isQY8/1WD97XDUsX2ShBdabUzxWffYw=";
       "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
-      "cosmic-config-0.1.0" = "sha256-PR6u2DT+HneMSFszfg0sZK7oLwsOX4YtpUP88KWHy68=";
-      "cosmic-syntax-theme-0.1.0" = "sha256-9Vf2s5Ry2hco80EbXOuVLwvOWygRiuaRD4tTImWooSg=";
-      "cosmic-text-0.10.0" = "sha256-WxT0LPXu17jb0XpuCu2PjlGTV1a0K1HMhl6WpciKMkM=";
-      "glyphon-0.4.1" = "sha256-mwJXi63LTBIVFrFcywr/NeOJKfMjQaQkNl3CSdEgrZc=";
-      "sctk-adwaita-0.5.4" = "sha256-yK0F2w/0nxyKrSiHZbx7+aPNY2vlFs7s8nu/COp2KqQ=";
-      "softbuffer-0.3.3" = "sha256-eKYFVr6C1+X6ulidHIu9SP591rJxStxwL9uMiqnXx4k=";
-      "smithay-client-toolkit-0.16.1" = "sha256-z7EZThbh7YmKzAACv181zaEZmWxTrMkFRzP0nfsHK6c=";
+      "cosmic-config-0.1.0" = "sha256-lFX/x4Abfk+ZPeFXY02LweMj6bEn+WfGa5e8SAUZGcc=";
+      "cosmic-files-0.1.0" = "sha256-mQ5YJXVFTPfzAf6Ugzb16IlJ7pkFjjQqJVXu/Us/XGc=";
+      "cosmic-syntax-theme-0.1.0" = "sha256-BNb9wrryD5FJImboD3TTdPRIfiBqPpItqwGdT1ZiNng=";
+      "cosmic-text-0.11.2" = "sha256-Y9i5stMYpx+iqn4y5DJm1O1+3UIGp0/fSsnNq3Zloug=";
+      "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
+      "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
+      "softbuffer-0.4.1" = "sha256-a0bUFz6O8CWRweNt/OxTvflnPYwO5nm6vsyc/WcXyNg=";
       "systemicons-0.7.0" = "sha256-zzAI+6mnpQOh+3mX7/sJ+w4a7uX27RduQ99PNxLNF78=";
       "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
-      "winit-0.28.6" = "sha256-FhW6d2XnXCGJUMoT9EMQew9/OPXiehy/JraeCiVd76M=";
+      "winit-0.29.10" = "sha256-ScTII2AzK3SC8MVeASZ9jhVWsEaGrSQ2BnApTxgfxK4=";
     };
   };
 
