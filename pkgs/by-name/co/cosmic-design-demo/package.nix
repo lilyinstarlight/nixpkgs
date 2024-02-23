@@ -14,13 +14,13 @@
 , cosmic-icons
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-design-demo";
-  version = "unstable-2024-01-08";
+  version = "0-unstable-2024-01-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
+    repo = "cosmic-design-demo";
     rev = "d58cfad46f2982982494fce27fb00ad834dc8992";
     hash = "sha256-nWkiaegSjxgyGlpjXE9vzGjiDORaRCSoZJMDv0jtvaA=";
   };
