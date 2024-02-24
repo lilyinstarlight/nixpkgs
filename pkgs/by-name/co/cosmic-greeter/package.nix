@@ -11,31 +11,38 @@
 , wayland
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-greeter";
-  version = "unstable-2023-11-08";
+  version = "0-unstable-2024-02-25";
 
   src = fetchFromGitHub {
     owner = "pop-os";
-    repo = pname;
-    rev = "a497ed8b1e67aaa9eb878d4ba225b40a71e1706c";
-    sha256 = "sha256-P37i0JYP21gGE7NIq9G3WVUa0vv2MdFJmo/GuRDuV8A=";
+    repo = "cosmic-greeter";
+    rev = "df9f2092e80f04afeabe68cde92732e450c17683";
+    sha256 = "sha256-pMtpnTJzml5s/8uf7cW4njhilNJXs24QGWi/ILsBGNA=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "accesskit-0.11.0" = "sha256-/6KUCH1CwMHd5YEMOpAdVeAxpjl9JvrzDA4Xnbd1D9k=";
+      "accesskit-0.11.0" = "sha256-xVhe6adUb8VmwIKKjHxwCwOo5Y1p3Or3ylcJJdLDrrE=";
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
       "cosmic-bg-config-0.1.0" = "sha256-fdRFndhwISmbTqmXfekFqh+Wrtdjg3vSZut4IAQUBbA=";
-      "cosmic-config-0.1.0" = "sha256-c2pGujYQ3WbbiHGhPo2kG8/NiydmpfFNQrlrb1nk/RY=";
-      "smithay-client-toolkit-0.17.0" = "sha256-vDY4cqz5CZD12twElUWVCsf4N6VO9O+Udl8Dc4arWK4=";
-      "softbuffer-0.2.0" = "sha256-VD2GmxC58z7Qfu/L+sfENE+T8L40mvUKKSfgLmCTmjY=";
-      "taffy-0.3.11" = "sha256-8gctP/nRiYxTSDrLyXi/oQbA7bE41ywgMbyotY1N8Zk=";
+      "cosmic-client-toolkit-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-config-0.1.0" = "sha256-NRqpgQjLf6ZijhcnyWdVsCam4W/gtVf/b2+m+7IzW4o=";
+      "cosmic-dbus-networkmanager-0.1.0" = "sha256-z/dvRyc3Zc1fAQh2HKk6NI6QSDpNqarqslwszjU+0nc=";
+      "cosmic-text-0.10.0" = "sha256-WxT0LPXu17jb0XpuCu2PjlGTV1a0K1HMhl6WpciKMkM=";
+      "glyphon-0.4.1" = "sha256-mwJXi63LTBIVFrFcywr/NeOJKfMjQaQkNl3CSdEgrZc=";
+      "smithay-client-toolkit-0.18.0" = "sha256-2WbDKlSGiyVmi7blNBr2Aih9FfF2dq/bny57hoA4BrE=";
+      "softbuffer-0.3.3" = "sha256-eKYFVr6C1+X6ulidHIu9SP591rJxStxwL9uMiqnXx4k=";
+      "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
     };
   };
 
   nativeBuildInputs = [ rustPlatform.bindgenHook cmake just pkg-config ];
   buildInputs = [ libxkbcommon wayland linux-pam ];
+
+  cargoBuildFlags = [ "--all" ];
 
   dontUseJustBuild = true;
 
@@ -46,6 +53,9 @@ rustPlatform.buildRustPackage rec {
     "--set"
     "bin-src"
     "target/${rust.lib.toRustTargetSpecShort stdenv.hostPlatform}/release/cosmic-greeter"
+    "--set"
+    "daemon-src"
+    "target/${rust.lib.toRustTargetSpecShort stdenv.hostPlatform}/release/cosmic-greeter-daemon"
   ];
 
   meta = with lib; {
