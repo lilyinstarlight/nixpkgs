@@ -76,6 +76,8 @@ rustPlatform.buildRustPackage {
   # These libraries are only used by the X11 backend, which will not
   # be the common case, so just make them available, don't link them.
   postInstall = ''
+    mkdir -p $out/etc/cosmic-comp
+    cp config.ron $out/etc/cosmic-comp/config.ron
     wrapProgramArgs=(--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [
         xorg.libX11 xorg.libXcursor xorg.libXi xorg.libXrandr
     ]})
@@ -83,6 +85,7 @@ rustPlatform.buildRustPackage {
     wrapProgramArgs+=(--prefix PATH : ${lib.makeBinPath [ xwayland ]})
   '' + ''
     wrapProgram $out/bin/cosmic-comp "''${wrapProgramArgs[@]}" \
+      --suffix XDG_CONFIG_DIRS : $out/etc \
       --suffix XDG_DATA_DIRS : ${cosmic-settings}/share:${cosmic-icons}/share
   '';
 
