@@ -3,49 +3,53 @@
 , fetchFromGitHub
 , rustPlatform
 , just
+, libinput
 , pkg-config
-, util-linuxMinimal
+, util-linux
 , dbus
 , glib
 , libxkbcommon
 , pulseaudio
+, udev
 , wayland
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-applets";
-  version = "unstable-2023-11-13";
+  version = "0-unstable-2024-02-26";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-applets";
-    rev = "21fc43e5781a7fbe7e7f39a0b68963dc8c2d486d";
-    hash = "sha256-WOUlYIh4a8qQhga4weKcuJYxNL5fa4FzNFuRB1T32oU=";
+    rev = "968663c6be33656a98adb871c0fdadbe200b11ff";
+    hash = "sha256-G3pQCd1/UuOdtBfjMpdNKDbkEX4OJuZfrf8K6aNZS5E=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "accesskit-0.11.0" = "sha256-xVhe6adUb8VmwIKKjHxwCwOo5Y1p3Or3ylcJJdLDrrE=";
-      "cosmic-client-toolkit-0.1.0" = "sha256-st46wmOncJvu0kj6qaot6LT/ojmW/BwXbbGf8s0mdZ8=";
-      "cosmic-config-0.1.0" = "sha256-6g/Om3SFLa+3fu2dkifbXbFP3ksXTbsjb6Xu7tDB570=";
-      "cosmic-dbus-networkmanager-0.1.0" = "sha256-eSUyDME39UhoimO/gd2mJDaunCrLNXesO9C69IwtjgM=";
-      "cosmic-notifications-config-0.1.0" = "sha256-QsLlm+jxsmc90Jc73qKgi52PVZoSwuGXDXw+iSJTALw=";
-      "cosmic-panel-config-0.1.0" = "sha256-uUq+xElZMcG5SWzha9/8COaenycII5aiXmm7sXGgjXE=";
-      "cosmic-time-0.3.0" = "sha256-Vx9MrdnAwqDCnA6WgT/cXxs4NDWvAVZ6hv0FXi2A8t4=";
+      "accesskit-0.12.2" = "sha256-ksaYMGT/oug7isQY8/1WD97XDUsX2ShBdabUzxWffYw=";
+      "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
+      "cosmic-client-toolkit-0.1.0" = "sha256-vj7Wm1uJ5ULvGNEwKznNhujCZQiuntsWMyKQbIVaO/Q=";
+      "cosmic-comp-config-0.1.0" = "sha256-uUpRd8bR2TyD7Y1lpKmJTaTNv9yNsZVnr0oWDQgHD/0=";
+      "cosmic-config-0.1.0" = "sha256-P7GCTYfRvqIN8CeheyTELx6fMKCTsaZCp9oEbda2jCo=";
+      "cosmic-dbus-networkmanager-0.1.0" = "sha256-ztZ5HD1hEOvsUSn94ZbbJ6SY9Jbsm8iGHR70GuAnEaQ=";
+      "cosmic-notifications-config-0.1.0" = "sha256-hC76AYUC9Igjx5jFr1157UHVbBT5L9x2YhUslsFaBrc=";
+      "cosmic-panel-config-0.1.0" = "sha256-gPQ5BsLvhnopnnGeKbUizmgk0yhEEgSD0etX9YEWc5E=";
+      "cosmic-settings-daemon-0.1.0" = "sha256-z/dvRyc3Zc1fAQh2HKk6NI6QSDpNqarqslwszjU+0nc=";
+      "cosmic-text-0.11.2" = "sha256-EG0jERREWR4MBWKgFmE/t6SpTTQRXK76PPa7+/TAKOA=";
+      "cosmic-time-0.4.0" = "sha256-mMTctwZdW4vlX7m7Aq682bZViObnPH8V5KsVCKDV47M=";
+      "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
+      "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
       "smithay-client-toolkit-0.18.0" = "sha256-9NwNrEC+csTVtmXrNQFvOgohTGUO2VCvqOME7SnDCOg=";
-      "softbuffer-0.2.0" = "sha256-VD2GmxC58z7Qfu/L+sfENE+T8L40mvUKKSfgLmCTmjY=";
-      "taffy-0.3.11" = "sha256-0hXOEj6IjSW8e1t+rvxBFX6V9XRum3QO2Des1XlHJEw=";
-      "xdg-shell-wrapper-config-0.1.0" = "sha256-3Dc2fU8xBVUmAs0Q1zEdcdG7vlxpBO+UIlyM/kzGcC4=";
+      "softbuffer-0.4.1" = "sha256-a0bUFz6O8CWRweNt/OxTvflnPYwO5nm6vsyc/WcXyNg=";
+      "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
+      "xdg-shell-wrapper-config-0.1.0" = "sha256-PfuybCDLeRcVCkVxFK2T9BnL2uJz7C4EEPDZ9cWlPqk=";
     };
   };
 
-  postPatch = ''
-    substituteInPlace justfile --replace '#!/usr/bin/env' "#!$(command -v env)"
-  '';
-
-  nativeBuildInputs = [ just pkg-config util-linuxMinimal ];
-  buildInputs = [ dbus glib libxkbcommon pulseaudio wayland ];
+  nativeBuildInputs = [ just pkg-config util-linux ];
+  buildInputs = [ dbus glib libinput libxkbcommon pulseaudio udev wayland ];
 
   dontUseJustBuild = true;
 
