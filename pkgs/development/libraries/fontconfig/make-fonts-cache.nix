@@ -1,4 +1,4 @@
-{ runCommand, lib, fontconfig, fontDirectories }:
+{ runCommand, lib, fontconfig, fontconfigEtc ? fontconfig.out, fontDirectories }:
 
 runCommand "fc-cache"
   {
@@ -12,17 +12,18 @@ runCommand "fc-cache"
     '';
   }
   ''
-    export FONTCONFIG_FILE=$(pwd)/fonts.conf
+    export FONTCONFIG_FILE=$(pwd)/fc-cache.conf
+    export FONTCONFIG_PATH=${fontconfigEtc}/etc/fonts
 
-    cat > fonts.conf << EOF
+    cat > fc-cache.conf << EOF
     <?xml version='1.0'?>
     <!DOCTYPE fontconfig SYSTEM 'urn:fontconfig:fonts.dtd'>
     <fontconfig>
-      <include>${fontconfig.out}/etc/fonts/fonts.conf</include>
+      <include>fonts.conf</include>
       <cachedir>$out</cachedir>
     EOF
-    cat "$fontDirsPath" >> fonts.conf
-    echo "</fontconfig>" >> fonts.conf
+    cat "$fontDirsPath" >> fc-cache.conf
+    echo "</fontconfig>" >> fc-cache.conf
 
     mkdir -p $out
     fc-cache -sv
