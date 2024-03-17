@@ -34,19 +34,19 @@ let
 
   # configuration file to read fontconfig cache
   # priority 0
-  cacheConf  = makeCacheConf {};
+  cacheConfPkg  = makeCacheConfPkg {};
 
   # generate the font cache setting file
   # When cross-compiling, we can’t generate the cache, so we skip the
   # <cachedir> part. fontconfig still works but is a little slower in
   # looking things up.
-  makeCacheConf = { }:
+  makeCacheConfPkg = { }:
     let
-      makeCache = fontconfig: pkgs.makeFontsCache { inherit fontconfig; fontDirectories = config.fonts.packages; };
+      makeCache = fontconfig: pkgs.makeFontsCache { inherit fontconfig fontconfigEtc; fontDirectories = config.fonts.packages; };
       cache     = makeCache pkgs.fontconfig;
       cache32   = makeCache pkgs.pkgsi686Linux.fontconfig;
     in
-    pkgs.writeText "fc-00-nixos-cache.conf" ''
+    pkgs.writeTextDir "etc/fonts/conf.d/00-nixos-cache.conf" ''
       <?xml version='1.0'?>
       <!DOCTYPE fontconfig SYSTEM 'urn:fontconfig:fonts.dtd'>
       <fontconfig>
@@ -180,12 +180,9 @@ let
     mkdir -p $dst
 
     # fonts.conf
-    ln -s ${pkg.out}/etc/fonts/fonts.conf \
+    cp -L ${pkg.out}/etc/fonts/fonts.conf \
           $dst/../fonts.conf
-    # TODO: remove this legacy symlink once people stop using packages built before #95358 was merged
-    mkdir -p $out/etc/fonts/2.11
-    ln -s /etc/fonts/fonts.conf \
-          $out/etc/fonts/2.11/fonts.conf
+    substituteInPlace $dst/../fonts.conf --replace-warn '<include ignore_missing="yes">/etc/fonts/conf.d</include>' '<include>conf.d</include>'
 
     # fontconfig default config files
     ln -s ${pkg.out}/etc/fonts/conf.d/*.conf \
@@ -210,9 +207,6 @@ let
       (replaceDefaultConfig "11-lcdfilter-default.conf"
         "11-lcdfilter-${cfg.subpixel.lcdfilter}.conf")
     }
-
-    # 00-nixos-cache.conf
-    ln -s ${cacheConf}  $dst/00-nixos-cache.conf
 
     # 10-nixos-rendering.conf
     ln -s ${renderConf}       $dst/10-nixos-rendering.conf
@@ -244,6 +238,12 @@ let
   fontconfigEtc = pkgs.buildEnv {
     name  = "fontconfig-etc";
     paths = cfg.confPackages;
+    ignoreCollisions = true;
+  };
+
+  fontconfigEtcWithCache = pkgs.buildEnv {
+    name  = "fontconfig-etc-with-cache";
+    paths = cfg.confPackages ++ [ cacheConfPkg ];
     ignoreCollisions = true;
   };
 
@@ -484,7 +484,7 @@ in
   config = mkMerge [
     (mkIf cfg.enable {
       environment.systemPackages    = [ pkgs.fontconfig ];
-      environment.etc.fonts.source  = "${fontconfigEtc}/etc/fonts/";
+      environment.etc.fonts.source  = "${fontconfigEtcWithCache}/etc/fonts/";
       security.apparmor.includes."abstractions/fonts" = ''
         # fonts.conf
         r ${pkg.out}/etc/fonts/fonts.conf,
@@ -493,7 +493,7 @@ in
         r ${pkg.out}/etc/fonts/conf.d/*.conf,
 
         # 00-nixos-cache.conf
-        r ${cacheConf},
+        r ${cacheConfPkg}/etc/fonts/conf.d/*.conf,
 
         # 10-nixos-rendering.conf
         r ${renderConf},
