@@ -18,6 +18,7 @@
   systemd,
   gobject-introspection,
   wrapGAppsHook4,
+  writeText,
   vala,
   gi-docgen,
   gnome,
@@ -80,11 +81,20 @@ stdenv.mkDerivation rec {
   ];
 
   mesonFlags = [
-    # We are still using ssh-agent from gnome-keyring.
-    # https://github.com/NixOS/nixpkgs/issues/140824
-    "-Dssh_agent=false"
     "-Dgpg_path=${lib.getBin gnupg}/bin/gpg"
     (lib.mesonEnable "systemd" systemdSupport)
+    "--cross-file=${
+      writeText "cross-file.conf" (
+        ''
+          [binaries]
+          ssh-add = '${lib.getExe' openssh "ssh-add"}'
+          ssh-agent = '${lib.getExe' openssh "ssh-agent"}'
+        ''
+        + lib.optionalString systemdSupport ''
+          systemctl = '${lib.getExe' systemd "systemctl"}'
+        ''
+      )
+    }"
   ];
 
   doCheck = false; # fails 21 out of 603 tests, needs dbus daemon
